@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createAssessment, getAssessments } from "@/lib/db"
-import type { ApiResponse, Assessment } from "@/lib/types"
+import type { ApiResponse, Assessment } from "@/lib/utils/types"
 
 // GET /api/assessments - Listar todas as avaliações
 // Pode filtrar por patientId usando query parameter

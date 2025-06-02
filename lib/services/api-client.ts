@@ -5,6 +5,7 @@ let fakePatients: Patient[] = [
   { id: 'patient-1', name: 'Paciente Teste', birthDate: '2000-01-01' },
   { id: 'patient-2', name: 'Paciente Exemplo', birthDate: '2005-03-10' },
   { id: 'patient-fixed-id-1', name: 'Paciente com Avaliação Simulada', birthDate: '1995-05-20' }, // Ensure patient exists for the simulated assessment
+  { id: 'patient-3', name: 'Novo Paciente Teste', birthDate: '2010-07-07' }, // Novo paciente
 ]
 
 // Simulação de respostas de avaliação (manter se necessário para outras lógicas, mas o foco é fakeAssessments agora)
@@ -187,7 +188,82 @@ let fakeAssessments: Assessment[] = [
     createdAt: '2023-12-05T10:00:00.000Z', 
     updatedAt: '2023-12-05T10:00:00.000Z' 
   },
+  // Novas avaliações mocadas adicionadas para testes
+  {
+    id: 'assessment-patient1-scenario4',
+    patientId: 'patient-1',
+    date: '2024-01-10',
+    notes: 'Avaliação Paciente Teste - Cenário 4 (Mais Variedade)',
+    responses: {
+      sectionA: { "A.1": {"b1":"mastered"}, "A.2": {"b1":"not-used"}, "A.3": {"b1":"emergent"} },
+      sectionB: { "B.1": {"b1":"not-used"}, "B.2": {"b1":"mastered"}, "B.3": {"b1":"emergent"}, "B.4": {"b1":"not-used"} },
+      sectionC: { 
+        "C.1": {"b1":"emergent"}, "C.2": {"b1":"mastered"}, "C.3": {"b1":"not-used"}, "C.4": {"b1":"emergent"}, "C.5": {"b1":"mastered"},
+        "C.6": {"b1":"not-used"}, "C.7": {"b1":"emergent"}, "C.8": {"b1":"mastered"}, "C.9": {"b1":"not-used"}, "C.10": {"b1":"emergent"},
+        "C.11": {"b1":"mastered"}, "C.12": {"b1":"not-used"}, "C.13": {"b1":"emergent"}, "C.14": {"b1":"mastered"}, "C.15": {"b1":"not-used"},
+        "C.16": {"b1":"emergent"}, "C.17": {"b1":"mastered"},
+      } as Assessment['responses'],
+    },
+    createdAt: '2024-01-10T10:00:00.000Z',
+    updatedAt: '2024-01-10T10:00:00.000Z'
+  },
+  {
+    id: 'assessment-patient2-scenario4',
+    patientId: 'patient-2',
+    date: '2024-01-12',
+    notes: 'Avaliação Paciente Exemplo - Cenário 4 (Outra Combinação)',
+    responses: {
+      sectionA: { "A.1": {"b1":"not-used"}, "A.2": {"b1":"emergent"}, "A.3": {"b1":"mastered"} },
+      sectionB: { "B.1": {"b1":"emergent"}, "B.2": {"b1":"not-used"}, "B.3": {"b1":"mastered"}, "B.4": {"b1":"emergent"} },
+      sectionC: { 
+        "C.1": {"b1":"mastered"}, "C.2": {"b1":"not-used"}, "C.3": {"b1":"emergent"}, "C.4": {"b1":"mastered"}, "C.5": {"b1":"not-used"},
+        "C.6": {"b1":"emergent"}, "C.7": {"b1":"mastered"}, "C.8": {"b1":"not-used"}, "C.9": {"b1":"emergent"}, "C.10": {"b1":"mastered"},
+        "C.11": {"b1":"not-used"}, "C.12": {"b1":"emergent"}, "C.13": {"b1":"mastered"}, "C.14": {"b1":"not-used"}, "C.15": {"b1":"emergent"},
+        "C.16": {"b1":"mastered"}, "C.17": {"b1":"not-used"},
+      } as Assessment['responses'],
+    },
+    createdAt: '2024-01-12T10:00:00.000Z',
+    updatedAt: '2024-01-12T10:00:00.000Z'
+  },
+   {
+    id: 'assessment-patient-fixed-scenario4',
+    patientId: 'patient-fixed-id-1',
+    date: '2024-01-15',
+    notes: 'Avaliação Simulada - Cenário 4 (Mais Emergent/Not-Used)',
+    responses: {
+       sectionA: { "A.1": {"b1":"emergent"}, "A.2": {"b1":"emergent"}, "A.3": {"b1":"not-used"} },
+      sectionB: { "B.1": {"b1":"emergent"}, "B.2": {"b1":"not-used"}, "B.3": {"b1":"emergent"}, "B.4": {"b1":"not-used"} },
+      sectionC: { 
+        "C.1": {"b1":"not-used"}, "C.2": {"b1":"emergent"}, "C.3": {"b1":"not-used"}, "C.4": {"b1":"emergent"}, "C.5": {"b1":"not-used"},
+        "C.6": {"b1":"emergent"}, "C.7": {"b1":"not-used"}, "C.8": {"b1":"emergent"}, "C.9": {"b1":"not-used"}, "C.10": {"b1":"emergent"},
+        "C.11": {"b1":"not-used"}, "C.12": {"b1":"emergent"}, "C.13": {"b1":"not-used"}, "C.14": {"b1":"emergent"}, "C.15": {"b1":"not-used"},
+        "C.16": {"b1":"emergent"}, "C.17": {"b1":"not-used"},
+      } as Assessment['responses'],
+    },
+    createdAt: '2024-01-15T10:00:00.000Z',
+    updatedAt: '2024-01-15T10:00:00.000Z'
+  },
 ] as Assessment[];
+
+// Adicionar uma avaliação para o novo paciente mocada
+fakeAssessments.push({
+  id: 'assessment-patient3-scenario1',
+  patientId: 'patient-3',
+  date: '2024-01-20',
+  notes: 'Avaliação Novo Paciente - Cenário Inicial',
+  responses: {
+    sectionA: { "A.1": {"b1":"emergent"}, "A.2": {"b1":"emergent"}, "A.3": {"b1":"emergent"} },
+    sectionB: { "B.1": {"b1":"emergent"}, "B.2": {"b1":"emergent"}, "B.3": {"b1":"emergent"}, "B.4": {"b1":"emergent"} },
+    sectionC: { 
+      "C.1": {"b1":"emergent"}, "C.2": {"b1":"emergent"}, "C.3": {"b1":"emergent"}, "C.4": {"b1":"emergent"}, "C.5": {"b1":"emergent"},
+      "C.6": {"b1":"emergent"}, "C.7": {"b1":"emergent"}, "C.8": {"b1":"emergent"}, "C.9": {"b1":"emergent"}, "C.10": {"b1":"emergent"},
+      "C.11": {"b1":"emergent"}, "C.12": {"b1":"emergent"}, "C.13": {"b1":"emergent"}, "C.14": {"b1":"emergent"}, "C.15": {"b1":"emergent"},
+      "C.16": {"b1":"emergent"}, "C.17": {"b1":"emergent"},
+    } as Assessment['responses'],
+  },
+  createdAt: '2024-01-20T10:00:00.000Z',
+  updatedAt: '2024-01-20T10:00:00.000Z'
+});
 
 export const PatientsAPI = {
   getAll: async (): Promise<ApiResponse<Patient[]>> => ({ success: true, data: fakePatients }),

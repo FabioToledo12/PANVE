@@ -46,4 +46,4 @@ export async function deleteAssessment(id: string): Promise<boolean> {
 
 export async function getAllAssessments(): Promise<Assessment[]> {
   return [...assessments];
-} 
+}

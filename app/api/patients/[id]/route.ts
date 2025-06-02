@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getPatient, updatePatient, deletePatient } from "@/lib/db"
-import type { ApiResponse, Patient } from "@/lib/types"
+import type { ApiResponse, Patient } from "@/lib/utils/types"
 
 // GET /api/patients/[id] - Obter um paciente específico
 export async function GET(

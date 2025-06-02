@@ -1,7 +1,6 @@
-/*
 import { type NextRequest, NextResponse } from "next/server"
 import { updateAssessmentResponses, getAssessment } from "@/lib/db"
-import type { ApiResponse, Assessment } from "@/lib/types"
+import type { ApiResponse, Assessment } from "@/lib/utils/types"
 
 // PUT /api/assessments/[id]/responses - Atualizar respostas de uma avaliação
 export async function PUT(
@@ -56,4 +55,3 @@ export async function GET(
     return NextResponse.json({ success: false, error: "Erro ao buscar respostas" }, { status: 500 })
   }
 }
-*/

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createPatient, getPatients } from "@/lib/db"
-import type { ApiResponse, Patient } from "@/lib/types"
+import type { ApiResponse, Patient } from "@/lib/utils/types"
 
 // GET /api/patients - Listar todos os pacientes
 export async function GET(): Promise<NextResponse<ApiResponse<Patient[]>>> {

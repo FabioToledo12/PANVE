@@ -9,7 +9,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 flex flex-col items-center justify-center p-4">
       <div className="max-w-3xl w-full text-center space-y-6">
         <h1 className="text-4xl font-bold text-teal-800 tracking-tight">PANVE</h1>
-        <h2 className="text-2xl font-medium text-teal-700">Avaliação de Habilidades Comunicativas</h2>
+        <h2 className="text-2xl font-medium text-teal-700">Protocolo de avaliação não verbal</h2>
 
         <Card className="bg-white shadow-lg border-teal-200">
           <CardHeader>

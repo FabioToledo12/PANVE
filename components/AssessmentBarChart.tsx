@@ -10,68 +10,60 @@ interface AssessmentBarChartProps {
     responses: Assessment['responses'];
 }
 
-// Estrutura mockada das perguntas e comportamentos para calcular o total possível
+// Estrutura que define o total POSSÍVEL de comportamentos para cada pergunta
 const assessmentStructure = {
     sectionA: [
-        5, // Exemplo: A.1 tem 5 comportamentos possíveis
-        4, // Exemplo: A.2 tem 4 comportamentos possíveis
-        6, // Exemplo: A.3 tem 6 comportamentos possíveis
+        { id: 'A.1', totalBehaviors: 5 }, // Exemplo: A.1 tem 5 comportamentos possíveis
+        { id: 'A.2', totalBehaviors: 4 }, // Exemplo: A.2 tem 4 comportamentos possíveis
+        { id: 'A.3', totalBehaviors: 6 }, // Exemplo: A.3 tem 6 comportamentos possíveis
     ],
     sectionB: [
-        6, // B.1 tem 6 comportamentos (4 Corp, 1 Sons, 1 Fac)
-        6, // B.2 tem 6 comportamentos (3 Corp, 1 Sons, 1 Fac, 1 Vis)
-        8, // B.3 tem 8 comportamentos (5 Corp, 1 Sons, 1 Fac, 1 Vis)
-        7, // B.4 tem 7 comportamentos (4 Corp, 1 Sons, 1 Fac, 1 Vis)
+        { id: 'B.1', totalBehaviors: 6 }, // B.1 tem 6 comportamentos (4 Corp, 1 Sons, 1 Fac, 1 Vis)
+        { id: 'B.2', totalBehaviors: 6 }, // B.2 tem 6 comportamentos (3 Corp, 1 Sons, 1 Fac, 1 Vis)
+        { id: 'B.3', totalBehaviors: 8 }, // B.3 tem 8 comportamentos (5 Corp, 1 Sons, 1 Fac, 1 Vis)
+        { id: 'B.4', totalBehaviors: 7 }, // B.4 tem 7 comportamentos (4 Corp, 1 Sons, 1 Fac, 1 Vis)
     ],
-    sectionC: Array.from({ length: 17 }, (_, i) => {
-        // Assumindo 4 comportamentos por pergunta em C para simulação
-        return 4;
-    })
+    sectionC: Array.from({ length: 17 }, (_, i) => ({
+        id: `C.${i + 1}`,
+        totalBehaviors: 4 // Assumindo 4 comportamentos por pergunta em C para simulação
+    })),
+    // Adicionar outras seções (D, E, F, G) com seus IDs e totalBehaviors
 };
 
+// Helper para encontrar as informações da pergunta na estrutura
+const findQuestionInfo = (qId: string) => {
+    const sectionPrefix = qId.charAt(0);
+    let sectionKey: keyof typeof assessmentStructure | undefined;
+    if (sectionPrefix === 'A') sectionKey = 'sectionA';
+    else if (sectionPrefix === 'B') sectionKey = 'sectionB';
+    else if (sectionPrefix === 'C') sectionKey = 'sectionC';
+    // Adicionar lógica para outras seções (D, E, F, G)
+
+    if (!sectionKey) return null;
+
+    return assessmentStructure[sectionKey].find(q => q.id === qId) || null;
+};
 
 export const AssessmentBarChart: React.FC<AssessmentBarChartProps> = ({ responses }) => {
-    // Função auxiliar para contar os status e calcular percentuais
-    const calculateStatusPercentages = (questionResponses: Record<string, string> | undefined, totalBehaviors: number): { emergent: number, mastered: number, notUsed: number } => {
-        if (!questionResponses || totalBehaviors === 0) {
-            return { emergent: 0, mastered: 0, notUsed: 100 }; // 100% Não Usado se não houver respostas ou comportamentos totais
+    // Função auxiliar para contar os status E retornar as contagens e o total avaliado
+    const countStatuses = (questionResponses: Record<string, string> | undefined): { emergent: number, mastered: number, notUsedInResponses: number, totalEvaluated: number } => {
+        if (!questionResponses) {
+            return { emergent: 0, mastered: 0, notUsedInResponses: 0, totalEvaluated: 0 };
         }
 
         let emergentCount = 0;
         let masteredCount = 0;
+        let notUsedCountInResponses = 0;
+        const totalEvaluatedBehaviors = Object.keys(questionResponses).length;
 
-        // Contar apenas os comportamentos presentes nas respostas
         Object.keys(questionResponses).forEach(behaviorKey => {
             const status = questionResponses[behaviorKey];
             if (status === 'emergent') emergentCount++;
             else if (status === 'mastered') masteredCount++;
+            else if (status === 'not-used') notUsedCountInResponses++;
         });
 
-        const respondedCount = emergentCount + masteredCount;
-        const notUsedCount = totalBehaviors - respondedCount;
-
-        let emergentPercent = (emergentCount / totalBehaviors) * 100;
-        let masteredPercent = (masteredCount / totalBehaviors) * 100;
-        let notUsedPercent = (notUsedCount / totalBehaviors) * 100;
-
-        // Ajuste para garantir que a soma seja 100% devido a arredondamentos
-        const totalPercent = emergentPercent + masteredPercent + notUsedPercent;
-        if (totalPercent > 100) {
-            const diff = totalPercent - 100;
-            if (masteredPercent >= emergentPercent && masteredPercent >= notUsedPercent) masteredPercent -= diff;
-            else if (emergentPercent >= masteredPercent && emergentPercent >= notUsedPercent) emergentPercent -= diff;
-            else notUsedPercent -= diff;
-        } else if (totalPercent < 100 && notUsedCount >= 0) {
-            notUsedPercent += (100 - totalPercent);
-        }
-        // Garantir que nenhum percentual seja negativo
-        emergentPercent = Math.max(0, emergentPercent);
-        masteredPercent = Math.max(0, masteredPercent);
-        notUsedPercent = Math.max(0, notUsedPercent);
-
-
-
-        return { emergent: emergentPercent, mastered: masteredPercent, notUsed: notUsedPercent };
+        return { emergent: emergentCount, mastered: masteredCount, notUsedInResponses: notUsedCountInResponses, totalEvaluated: totalEvaluatedBehaviors };
     };
 
     // Processar dados das respostas para o gráfico empilhado em percentual
@@ -92,40 +84,41 @@ export const AssessmentBarChart: React.FC<AssessmentBarChartProps> = ({ response
         'not-used': '#B0B0B0', // Cinza escuro (para não usado/não respondido)
     };
 
+    // Definir a ordem das seções e perguntas esperadas e iterar sobre TODAS elas
+    const orderedSections: (keyof typeof assessmentStructure)[] = ['sectionA', 'sectionB', 'sectionC', /* Adicionar D, E, F, G */];
 
-    // Seção A (Nível 1) - 3 colunas/perguntas
-    const sectionAQuestions = ['A.1', 'A.2', 'A.3'];
-    sectionAQuestions.forEach((qId, index) => {
-        const totalBehaviors = assessmentStructure.sectionA[index];
-        const percentages = calculateStatusPercentages(responses?.sectionA?.[qId], totalBehaviors);
-        labels.push(qId);
-        emergentPercentages.push(percentages.emergent);
-        masteredPercentages.push(percentages.mastered);
-        notUsedPercentages.push(percentages.notUsed);
-    });
+    orderedSections.forEach(sectionKey => {
+        const questionsInSection = assessmentStructure[sectionKey];
 
-    // Seção B (Nível 2) - 4 colunas/perguntas
-    const sectionBQuestions = ['B.1', 'B.2', 'B.3', 'B.4'];
-    sectionBQuestions.forEach((qId, index) => {
-        const totalBehaviors = assessmentStructure.sectionB[index];
-        const percentages = calculateStatusPercentages(responses?.sectionB?.[qId], totalBehaviors);
-        labels.push(qId);
-        emergentPercentages.push(percentages.emergent);
-        masteredPercentages.push(percentages.mastered);
-        notUsedPercentages.push(percentages.notUsed);
-    });
+        questionsInSection.forEach(questionInfo => {
+            const qId = questionInfo.id;
+            const totalPossibleBehaviors = questionInfo.totalBehaviors; // Ainda precisa do total possível para o tooltip
+            const questionResponses = responses?.[sectionKey as keyof Assessment['responses']]?.[qId]; // Tenta obter as respostas para esta pergunta
 
-    // Seção C (Nível 3) - 17 colunas/perguntas
-    const sectionCQuestions = Array.from({ length: 17 }, (_, i) => `C.${i + 1}`);
-    sectionCQuestions.forEach((qId, index) => {
-        const totalBehaviors = assessmentStructure.sectionC[index];
-        // Para a seção C, garantir que se não houver respostas salvas, ele use a contagem de não usados
-        const sectionCResponses = responses?.sectionC?.[qId];
-        const percentages = calculateStatusPercentages(sectionCResponses, totalBehaviors);
-        labels.push(qId);
-        emergentPercentages.push(percentages.emergent);
-        masteredPercentages.push(percentages.mastered);
-        notUsedPercentages.push(percentages.notUsed);
+            const totalEvaluatedBehaviors = Object.keys(questionResponses || {}).length;
+
+            let emergentPercent = 0;
+            let masteredPercent = 0;
+            let notUsedPercent = 0;
+
+            if (totalEvaluatedBehaviors > 0) {
+                // Se há comportamentos avaliados, calcula percentuais sobre o total avaliado
+                const statusCounts = countStatuses(questionResponses);
+                emergentPercent = (statusCounts.emergent / totalEvaluatedBehaviors) * 100;
+                masteredPercent = (statusCounts.mastered / totalEvaluatedBehaviors) * 100;
+                notUsedPercent = (statusCounts.notUsedInResponses / totalEvaluatedBehaviors) * 100;
+
+            } else { // totalEvaluatedBehaviors === 0
+                // Se NÃO há comportamentos avaliados, 100% é "Não Usado/Não Respondido" (visualmente cinza claro)
+                notUsedPercent = 100;
+                // As cores padrão '#DDDDDD' serão usadas para este caso pelo dataset 'Não Usado/Não Respondido'.
+            }
+
+            labels.push(qId);
+            emergentPercentages.push(emergentPercent);
+            masteredPercentages.push(masteredPercent);
+            notUsedPercentages.push(notUsedPercent);
+        });
     });
 
     const chartData = {
@@ -163,7 +156,7 @@ export const AssessmentBarChart: React.FC<AssessmentBarChartProps> = ({ response
             },
             title: {
                 display: true,
-                text: 'Percentual de Status por Pergunta (Seção/Nível)',
+                text: 'Percentual de Status por Pergunta'
             },
             tooltip: {
                 callbacks: {
@@ -172,8 +165,46 @@ export const AssessmentBarChart: React.FC<AssessmentBarChartProps> = ({ response
                         if (label) {
                             label += ': ';
                         }
-                        label += context.raw.toFixed(1) + '%'; // Mostra o percentual com 1 casa decimal
-                        return label;
+                        const percent = context.raw.toFixed(1);
+                        label += percent + '%';
+
+                        // Encontrar as informações da pergunta
+                        const currentQuestionId = context.label;
+                        const questionInfo = findQuestionInfo(currentQuestionId);
+                        const totalPossibleBehaviors = questionInfo?.totalBehaviors || 0;
+
+                        // Encontrar as respostas avaliadas para esta pergunta na avaliação atual
+                        const sectionPrefix = currentQuestionId.charAt(0).toLowerCase();
+                        let sectionKey: keyof Assessment['responses'] | undefined;
+                        if (sectionPrefix === 'a') sectionKey = 'sectionA';
+                        else if (sectionPrefix === 'b') sectionKey = 'sectionB';
+                        else if (sectionPrefix === 'c') sectionKey = 'sectionC';
+                        // Adicionar lógica para outras seções (D, E, F, G)
+
+                        const questionResponses = sectionKey ? responses?.[sectionKey]?.[currentQuestionId] : undefined;
+                        const totalEvaluatedBehaviors = Object.keys(questionResponses || {}).length;
+
+                        // Calcular a contagem real do status para o tooltip
+                        let count = 0;
+
+                        if (context.dataset.label === 'Dominado') {
+                            count = (context.raw / 100) * totalEvaluatedBehaviors; // Dominado/Emergente/Não Usado em respostas é sobre total avaliado
+                        } else if (context.dataset.label === 'Emergente') {
+                            count = (context.raw / 100) * totalEvaluatedBehaviors;
+                        } else if (context.dataset.label === 'Não Usado/Não Respondido') {
+                            // Se a pergunta NÃO foi avaliada (totalEvaluatedBehaviors === 0)
+                            if (totalEvaluatedBehaviors === 0 && totalPossibleBehaviors > 0) { // Verifica totalPossibleBehaviors > 0 para evitar tooltip para perguntas sem comportamentos possíveis
+                                count = totalPossibleBehaviors; // A contagem total é o total possível de comportamentos
+                            } else if (totalEvaluatedBehaviors > 0) { // Se a pergunta FOI avaliada
+                                count = (context.raw / 100) * totalEvaluatedBehaviors; // A contagem é o percentual exibido sobre o total avaliado
+                            }
+                        }
+
+                        // Exibir a contagem real (arredondada) sobre o total apropriado
+                        let totalForTooltip = totalEvaluatedBehaviors > 0 ? totalEvaluatedBehaviors : totalPossibleBehaviors;
+                        if (totalForTooltip === 0) return label; // Evitar divisão por zero no tooltip se não houver totais
+
+                        return label + ` (${Math.round(count)}/${totalForTooltip})`;
                     }
                 }
             }
